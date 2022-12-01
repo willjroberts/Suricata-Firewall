@@ -39,8 +39,8 @@ def main_loop(args):
 
     time.sleep(1)
 
-    """Main loop. New alerts will be appended to a new list and searched for relevant keywords.
-       Alert counts updated per loopi to determine if new alerts occurred between loops."""
+    """Main loop. New alerts will be appended to a new list and scanned for relevant keywords.
+       Alert counts updated per loop to determine if new alerts occurred since last check."""
 
     while True:
         try:
@@ -58,19 +58,19 @@ def main_loop(args):
         except KeyboardInterrupt:
             print(f"Firewall stopped. Exiting. Time: {current_time}")
             with open('/var/log/python_firewall_error.log', 'a') as f:
-                f.write('--------------------------------------------------------------------------------\n\n\n')
+                f.write('--------------------------------------------------------------------------------\n')
                 f.write(f'Firewall manually stopped. Exited at {current_time} \n\n\n')
                 exit()
         except Exception:
             print("Error occurred. Exiting. Time: {current_time}")
             with open('/var/log/python_firewall_error.log', 'a') as f:
-                f.write('--------------------------------------------------------------------------------\n\n\n')
-                f.write(f'Firewall error occurred. Exited at {current_time} \n\n\n')
+                f.write('--------------------------------------------------------------------------------\n')
+                f.write(f'Firewall error occurred. Exited at {current_time} \n')
                 exit()
 
 
 def log_parser(log, blocklist):
-    """Scans eve.json for certain alerts. If IP is already in ipset
+    """Scans eve.json for certain alerts based on keywords. If IP is already in ipset
     blocklist, the IP is not added"""
 
     src_keywords = ['DLL', 'EXE', 'SSH']
@@ -91,8 +91,8 @@ def log_parser(log, blocklist):
                         print(f"{ip} added at {current_time}")
                         blocked_ips.append(ip)
                         with open('/var/log/python_firewall.log', 'a') as f:
-                            f.write('--------------------------------------------------------------------------------\n\n\n')
-                            f.write(f"{ip} added at {current_time} Signature: {i['alert']['signature']}")  
+                            f.write('--------------------------------------------------------------------------------\n')
+                            f.write(f"{ip} added at {current_time} Signature: {i['alert']['signature']}\n")  
                     else:
                         for word in dest_keywords:
                             if word in i['alert']['signature']:
@@ -102,8 +102,8 @@ def log_parser(log, blocklist):
                                     print(f"{ip} added at {current_time}")
                                     blocked_ips.append(ip)
                                     with open('/var/log/python_firewall.log', 'a') as f:
-                                        f.write('--------------------------------------------------------------------------------\n\n\n')
-                                        f.write(f"{ip} added at {current_time} Signature: {i['alert']['signature']}")  
+                                        f.write('--------------------------------------------------------------------------------\n')
+                                        f.write(f"{ip} added at {current_time} Signature: {i['alert']['signature']}\n")  
 
     
 
