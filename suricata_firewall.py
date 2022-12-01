@@ -66,7 +66,7 @@ def main_loop(args):
             print("Error occurred. Exiting. Time: {current_time}")
             with open('/var/log/python_firewall_error.log', 'a') as f:
                 f.write('--------------------------------------------------------------------------------\n')
-                f.write(f'Firewall error occurred. Exited at {current_time} \n')
+                f.write(f'Firewall error occurred. Exited at {current_time} \n\n\n')
                 exit()
 
 
