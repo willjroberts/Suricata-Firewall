@@ -13,6 +13,7 @@ def main_loop(args):
     
     path = args[1]
     blocklist = ip_list(args[2])
+    ipsetListName = args[2]
     current_time = datetime.datetime.utcnow()
 
     print("Checking current blocklist...")
@@ -35,7 +36,7 @@ def main_loop(args):
 
     #Parse eve.json on startup to add IPs to blocklist
 
-    log_parser(log_formatter(path), blocklist)
+    log_parser(log_formatter(path), blocklist, ipsetListName)
 
     time.sleep(1)
 
@@ -50,7 +51,7 @@ def main_loop(args):
                 updatedLog = log_formatter(path)
                 for alert in updatedLog[(initialAlertCount - currentAlertCount):]:
                     reducedLog.append(alert)
-                log_parser(reducedLog, blocklist)
+                log_parser(reducedLog, blocklist, ipsetListName)
                 initialAlertCount = currentAlertCount
                 time.sleep(5)
             else:
@@ -69,7 +70,7 @@ def main_loop(args):
                 exit()
 
 
-def log_parser(log, blocklist):
+def log_parser(log, blocklist, ipsetName):
     """Scans eve.json for certain alerts based on keywords. If IP is already in ipset
     blocklist, the IP is not added"""
 
@@ -78,6 +79,7 @@ def log_parser(log, blocklist):
 
     ip = ''
     blocked_ips = blocklist
+    ipListName = ipsetname
 
     current_time = datetime.datetime.utcnow()
 
@@ -87,7 +89,7 @@ def log_parser(log, blocklist):
                 if word in i['alert']['signature']:
                     ip = i['src_ip']
                     if ip not in blocked_ips:
-                        subprocess.run(f"ipset add blacklist {ip}", shell=True)
+                        subprocess.run(f"ipset add {ipListName} {ip}", shell=True)
                         print(f"{ip} added at {current_time}")
                         blocked_ips.append(ip)
                         with open('/var/log/python_firewall.log', 'a') as f:
@@ -98,7 +100,7 @@ def log_parser(log, blocklist):
                             if word in i['alert']['signature']:
                                 ip = i['dest_ip']
                                 if ip not in blocked_ips:
-                                    subprocess.run(f"ipset add blacklist {ip}", shell=True)
+                                    subprocess.run(f"ipset add {ipListName} {ip}", shell=True)
                                     print(f"{ip} added at {current_time}")
                                     blocked_ips.append(ip)
                                     with open('/var/log/python_firewall.log', 'a') as f:
